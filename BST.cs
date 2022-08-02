@@ -51,7 +51,6 @@ namespace BST
         }
 
         public Node Root { get; set; }
-
         public ArrayList? Children { get; set; }
         public int Size{ get; set; }
         public BST(object rootElem)
@@ -90,6 +89,26 @@ namespace BST
                 return Math.Max(hLeft, hRight) + 1;
             }
         }
+        private int noDepth(Node node)
+        {
+            int depth = 0;
+            Node root = this.Root;
+
+            while (root != node)
+            {
+                depth++;
+                if (Comparer.comparer(node.Element, root.Element) == 1)
+                {
+                    root = root.RightChild;
+                }
+                else
+                {
+                    root = root.LeftChild;
+                }
+            }
+            return depth;
+            
+        }
 
         //Métodos de consulta
         private bool isRoot(Node node)
@@ -113,13 +132,13 @@ namespace BST
             if (isExternal(node)) { return node; }
 
             //Se elemento procurado for menor que elemento do nó
-            if (comparer(element, node.Element) == -1)
+            if (Comparer.comparer(element, node.Element) == -1)
             {
                 return noSearch(element, node.LeftChild);
             }
 
             //Se elemento procurado for igual ao elemento do nó
-            else if (comparer(element, node.Element) == 0)
+            else if (Comparer.comparer(element, node.Element) == 0)
             {
                 return node;
             }
@@ -140,7 +159,7 @@ namespace BST
             {
                 parent = auxNode;
                 //Se elemento novo for menor que nó atual
-                if (comparer(element, auxNode.Element) == -1)
+                if (Comparer.comparer(element, auxNode.Element) == -1)
                 {
                     auxNode = auxNode.LeftChild;
                 }
@@ -151,7 +170,7 @@ namespace BST
                 }
             }
             //Se novo valor é menor que o do seu pai
-            if (comparer(element, parent.Element) == -1)
+            if (Comparer.comparer(element, parent.Element) == -1)
             {
                 parent.addLeftChild(element);
             }
@@ -168,18 +187,20 @@ namespace BST
         {
             treeRemove(element, this.Root);
         }
+
         private Node treeRemove(object element, Node node)
         {
 
-            if(node == null) { return node; }
+            //Caso base
+            if (node == null) { return node; }
 
             //Chegar até o nó a ser removido
-            if (comparer(element, node.Element) == -1)
+            if (Comparer.comparer(element, node.Element) == -1)
             {
                 node.LeftChild = treeRemove(element, node.LeftChild);
             }
 
-            else if (comparer(element, node.Element) == 1)
+            else if (Comparer.comparer(element, node.Element) == 1)
             {
                 node.RightChild = treeRemove(element, node.RightChild);
             }
@@ -223,72 +244,31 @@ namespace BST
         }
         public void show()
         {
-            printBinaryTree(this.Root);
+            List<Node> nodes = new List<Node>();
+            printOrder(this.Root, nodes);
+            printNodes(nodes);
+            Console.WriteLine();
         }
-        private void printBinaryTree(Node root)
+        private void printOrder(Node root, List<Node> nodes)
         {
-            LinkedList<Node> treeLevel = new LinkedList<Node>();
-            treeLevel.AddLast(root);
-            LinkedList<Node> temp = new LinkedList<Node>();
-            int counter = 0;
-            int height = noHeight(root);
-            double numberOfElements = (Math.Pow(2, (height + 1)) - 1);
-            while (counter <= height)
-            {
-                Node removed = treeLevel.First();
-                treeLevel.RemoveFirst();
-                if (temp.Count == 0)
-                {
-                    printSpace(numberOfElements / Math.Pow(2, counter + 1), removed);
-                }
-                else
-                {
-                    printSpace(numberOfElements / Math.Pow(2, counter), removed);
-                }
-                if (removed == null)
-                {
-                    temp.AddLast((Node)null);
-                    temp.AddLast((Node)null);
-                }
-                else
-                {
-                    temp.AddLast(removed.LeftChild);
-                    temp.AddLast(removed.RightChild);
-                }
+            if (root == null) return;
 
-                if (treeLevel.Count == 0)
-                {
-                    Console.WriteLine("");
-                    Console.WriteLine("");
-                    treeLevel = temp;
-                    temp = new LinkedList<Node>();
-                    counter++;
-                }
-
-            }
-            void printSpace(double n, Node removed)
+            printOrder(root.RightChild, nodes);
+            nodes.Add(root);
+            printOrder(root.LeftChild, nodes);
+        }
+        private void printNodes(List<Node> nodes)
+        {
+            foreach (var node in nodes)
             {
-                for (; n > 0; n--)
+                Console.WriteLine();
+                for (int i = 0; i < noDepth(node); i++)
                 {
-                    Console.Write(" ");
+                    Console.Write("     ");
                 }
-                if (removed == null)
-                {
-                    Console.Write(" ");
-                }
-                else
-                {
-                    Console.Write(removed.Element);
-                }
+                Console.WriteLine(node.Element); 
             }
         }
-
-        //Comparador
-        private int comparer(object element1, object element2)
-        {
-            if (Convert.ToInt32(element1) == Convert.ToInt32(element2)) { return 0; }
-            if (Convert.ToInt32(element1) > Convert.ToInt32(element2)) { return 1; }
-            else { return -1;}
-        }
+        
     }
 }
