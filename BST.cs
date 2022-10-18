@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace BST
 {
-    internal class BST
+    public class BST
     {
-        internal class Node
+        public class Node
         {
             public object Element { get; set; }
             public Node? Parent { get; set; }
@@ -69,7 +69,7 @@ namespace BST
         //retorna a altura da árvore
         public int height() { return noHeight(this.Root); }
         //retorna a altura do nó
-        private int noHeight(Node node)
+        internal int noHeight(Node node)
         {
             if (node.isExternal()) { return 0; }
             else
@@ -89,7 +89,7 @@ namespace BST
                 return Math.Max(hLeft, hRight) + 1;
             }
         }
-        private int noDepth(Node node)
+        internal int noDepth(Node node)
         {
             int depth = 0;
             Node root = this.Root;
@@ -149,7 +149,7 @@ namespace BST
                 return noSearch(element, node.RightChild);
             }
         }
-        public void Insert(object element)
+        public virtual void Insert(object element)
         {
             //O pai do novo nó
             Node parent = null;
@@ -257,7 +257,7 @@ namespace BST
             nodes.Add(root);
             printOrder(root.LeftChild, nodes);
         }
-        private void printNodes(List<Node> nodes)
+        public virtual void printNodes(List<Node> nodes)
         {
             foreach (var node in nodes)
             {
@@ -266,9 +266,10 @@ namespace BST
                 {
                     Console.Write("     ");
                 }
-                Console.WriteLine(node.Element); 
+                Console.WriteLine(node); 
             }
         }
         
     }
+
 }
