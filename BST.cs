@@ -144,12 +144,12 @@ namespace BST
             this.Size++;
         }
 
-        public void Remove(object element)
+        public virtual void Remove(object element)
         {
             treeRemove(element, this.Root);
         }
 
-        private Node treeRemove(object element, Node node)
+        internal virtual Node treeRemove(object element, Node node)
         {
 
             //Caso base
@@ -195,7 +195,7 @@ namespace BST
             return node;
         }
         //Retorna o nó com o menor elemento da subarvore de node
-        private Node min(Node node)
+        internal Node min(Node node)
         {
             while (node.hasLeft())
             {
