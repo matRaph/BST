@@ -58,52 +58,8 @@ namespace BST
         internal override Node treeRemove(object element, Node node){
             return (AVLNode)base.treeRemove(element, node);
         }
-        // public override AVLNode treeRemove(object element, AVLNode node)
-        // {
-        //     //Caso base
-        //     if (node == null) { return node; }
-
-        //     //Chegar até o nó a ser removido
-        //     if (Comparer.comparer(element, node.Element) == -1)
-        //     {
-        //         node.LeftChild = (AVLNode)treeRemove(element, node.LeftChild);
-        //     }
-
-        //     else if (Comparer.comparer(element, node.Element) == 1)
-        //     {
-        //         node.RightChild = (AVLNode)treeRemove(element, node.RightChild);
-        //     }
-
-        //     //Remove, de fato, o nó
-        //     else
-        //     {
-        //         //Se possuir apenas o filho à direita
-        //         if (!node.hasLeft())
-        //         {
-        //             node.Parent = null;
-        //             return (AVLNode)node.RightChild;
-        //         }
-
-        //         //Se possuir apenas o filho à esquerda
-        //         else if (!node.hasRight())
-        //         {
-        //             node.Parent = null;
-        //             return (AVLNode)node.LeftChild;
-        //         }
-
-        //         //Se possuir os dois filhos
-        //         else
-        //         {
-        //             AVLNode successor = (AVLNode)min(node.RightChild);
-        //             node.Element = successor.Element;
-        //             node.RightChild = (AVLNode)treeRemove(successor.Element, node.RightChild);
-        //         }
-        //     }
-
-        //     return node;
-        // }
-
-        private void updateBFInsert(AVLNode node)
+        
+        private void updateBF(AVLNode node, bool isInsert)
         {                
             AVLNode parent = (AVLNode)node.Parent;
             if (parent == null)
@@ -112,19 +68,37 @@ namespace BST
             }
             else
             {
-                if (parent.LeftChild == node)
-                {   
-                    parent.BalanceFactor--;
+                if (isInsert){
+                    if (parent.LeftChild == node)
+                    {   
+                        parent.BalanceFactor--;
+                    }
+                    else
+                    {
+                        parent.BalanceFactor++;
+                    }
+                    if (parent.BalanceFactor != 0)
+                    {
+                        updateBF(parent, true);
+                    }
                 }
                 else
                 {
-                    parent.BalanceFactor++;
-                }
-                if (parent.BalanceFactor != 0)
-                {
-                    updateBFInsert(parent);
+                    if (parent.LeftChild == node)
+                    {
+                        parent.BalanceFactor++;
+                    }
+                    else
+                    {
+                        parent.BalanceFactor--;
+                    }
+                    if (parent.BalanceFactor != 0)
+                    {
+                        updateBF(parent, false);
+                    }
                 }
             }
+                
         }
         private void updateBFRemove(AVLNode node)
         {
