@@ -9,46 +9,6 @@ namespace BST
 {
     public class BST
     {
-        public class Node
-        {
-            public object Element { get; set; }
-            public Node? Parent { get; set; }
-            public Node? LeftChild { get; set; }
-            public Node? RightChild { get; set; }
-            public ArrayList Children { get; set; }
-            public Node(Node parent, object element)
-            {
-                this.Parent = parent;
-                this.Element = element;
-            }
-            public override string ToString() => Element.ToString();
-
-            //Métodos de consulta
-            public bool isInternal() {
-                return (this.LeftChild != null) || (this.RightChild != null);
-            }
-            public bool isExternal()
-            {
-                return (this.LeftChild == null) && (this.RightChild == null);
-            }
-            public bool hasLeft() { return this.LeftChild != null; }
-            public bool hasRight() { return this.RightChild != null; }
-            public Node leftChild() { return this.LeftChild; }
-            public Node rightChild() { return this.RightChild; }
-
-            //Métodos de manipulação
-            public void addLeftChild(object element)
-            {
-                Node node = new(this,element);
-                this.LeftChild = node;
-            }
-            public void addRightChild(object element)
-            {
-                Node node = new(this, element);
-                this.RightChild = node;
-            }
-
-        }
 
         public Node Root { get; set; }
         public ArrayList? Children { get; set; }
@@ -67,9 +27,9 @@ namespace BST
         //retorna o número de nós da árvore
         public int size() { return this.Size; }
         //retorna a altura da árvore
-        public int height() { return noHeight(this.Root); }
+        public virtual int height() { return noHeight(this.Root); }
         //retorna a altura do nó
-        internal int noHeight(Node node)
+        private int noHeight(Node node)
         {
             if (node.isExternal()) { return 0; }
             else
@@ -127,7 +87,7 @@ namespace BST
         {
             return noSearch(element, this.Root).Element;
         }
-        private Node noSearch(object element, Node node)
+        internal Node noSearch(object element, Node node)
         {
             if (isExternal(node)) { return node; }
 
@@ -169,7 +129,8 @@ namespace BST
                     auxNode = auxNode.RightChild;
                 }
             }
-            //Se novo valor é menor que o do seu pai
+
+            // Se novo valor é menor que o do seu pai
             if (Comparer.comparer(element, parent.Element) == -1)
             {
                 parent.addLeftChild(element);
@@ -242,14 +203,14 @@ namespace BST
             }
             return node;
         }
-        public void show()
+        public virtual void show()
         {
             List<Node> nodes = new List<Node>();
             printOrder(this.Root, nodes);
             printNodes(nodes);
             Console.WriteLine();
         }
-        private void printOrder(Node root, List<Node> nodes)
+        public virtual void printOrder(Node root, List<Node> nodes)
         {
             if (root == null) return;
 
