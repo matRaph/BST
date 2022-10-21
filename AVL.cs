@@ -48,12 +48,12 @@ namespace BST
             }
 
             this.Size++;
-            this.updateBFInsert(insertedNode);
+            this.updateBF(insertedNode, true);
         }
 
         public override void Remove(object element)
         {
-            treeRemove(element, this.Root);
+            updateBF((AVLNode)treeRemove(element, this.Root), false);
         }
         internal override Node treeRemove(object element, Node node){
             return (AVLNode)base.treeRemove(element, node);
@@ -62,6 +62,35 @@ namespace BST
         private void updateBF(AVLNode node, bool isInsert)
         {                
             AVLNode parent = (AVLNode)node.Parent;
+            if (node.BalanceFactor => 2 || node.BalanceFactor <= -2)
+            {
+                if (node.BalanceFactor > 0)
+                {
+                    AVLNode lChil = (AVLNode)node.LeftChild;
+                    if (lChil.BalanceFactor >= 0)
+                    {
+                        this.rotateRight(node);
+                    }
+                    else
+                    {
+                        this.rotateLeft((AVLNode)node.LeftChild);
+                        this.rotateRight(node);
+                    }
+                }
+                else
+                {
+                    AVLNode rChil = (AVLNode)node.RightChild;
+                    if (rChil.BalanceFactor <= 0)
+                    {
+                        this.rotateLeft(node);
+                    }
+                    else
+                    {
+                        this.rotateRight((AVLNode)node.RightChild);
+                        this.rotateLeft(node);
+                    }
+                }
+            }
             if (parent == null)
             {
                 return;
@@ -81,6 +110,7 @@ namespace BST
                     {
                         updateBF(parent, true);
                     }
+
                 }
                 else
                 {
@@ -99,29 +129,6 @@ namespace BST
                 }
             }
                 
-        }
-        private void updateBFRemove(AVLNode node)
-        {
-            AVLNode parent = (AVLNode)node.Parent;
-            if (parent == null)
-            {
-                return;
-            }
-            else
-            {
-                if (parent.LeftChild == node)
-                {
-                    parent.BalanceFactor++;
-                }
-                else
-                {
-                    parent.BalanceFactor--;
-                }
-                if (parent.BalanceFactor != 0)
-                {
-                    updateBFRemove(parent);
-                }
-            }
         }
     }
 }
