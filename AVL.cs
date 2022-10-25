@@ -62,19 +62,19 @@ namespace BST
         private void updateBF(AVLNode node, bool isInsert)
         {                
             AVLNode parent = (AVLNode)node.Parent;
-            if (node.BalanceFactor => 2 || node.BalanceFactor <= -2)
+            if (node.BalanceFactor >= 2 || node.BalanceFactor <= -2)
             {
                 if (node.BalanceFactor > 0)
                 {
                     AVLNode lChil = (AVLNode)node.LeftChild;
                     if (lChil.BalanceFactor >= 0)
                     {
-                        this.rotateRight(node);
+                        // this.rotateRight(node);
                     }
                     else
                     {
                         this.rotateLeft((AVLNode)node.LeftChild);
-                        this.rotateRight(node);
+                        // this.rotateRight(node);
                     }
                 }
                 else
@@ -86,7 +86,7 @@ namespace BST
                     }
                     else
                     {
-                        this.rotateRight((AVLNode)node.RightChild);
+                        // this.rotateRight((AVLNode)node.RightChild);
                         this.rotateLeft(node);
                     }
                 }
@@ -100,11 +100,11 @@ namespace BST
                 if (isInsert){
                     if (parent.LeftChild == node)
                     {   
-                        parent.BalanceFactor--;
+                        parent.BalanceFactor++;
                     }
                     else
                     {
-                        parent.BalanceFactor++;
+                        parent.BalanceFactor--;
                     }
                     if (parent.BalanceFactor != 0)
                     {
@@ -116,11 +116,11 @@ namespace BST
                 {
                     if (parent.LeftChild == node)
                     {
-                        parent.BalanceFactor++;
+                        parent.BalanceFactor--;
                     }
                     else
                     {
-                        parent.BalanceFactor--;
+                        parent.BalanceFactor++;
                     }
                     if (parent.BalanceFactor != 0)
                     {
@@ -129,6 +129,40 @@ namespace BST
                 }
             }
                 
+        }
+        private void rotateLeft(AVLNode node)
+        {
+            AVLNode parent = (AVLNode)node.Parent;
+            AVLNode rChild = (AVLNode)node.RightChild;
+            AVLNode rlChild = (AVLNode)rChild.LeftChild;
+
+            if (parent == null)
+            {
+                this.Root = rChild;
+                rChild.Parent = null;
+            }
+            else
+            {
+                if (parent.LeftChild == node)
+                {
+                    parent.LeftChild = rChild;
+                }
+                else
+                {
+                    parent.RightChild = rChild;
+                }
+                rChild.Parent = parent;
+            }
+            node.RightChild = rlChild;
+            if (rlChild != null)
+            {
+                rlChild.Parent = node;
+            }
+            rChild.LeftChild = node;
+            node.Parent = rChild;
+
+            node.BalanceFactor = node.BalanceFactor - 1 - Math.Max(rChild.BalanceFactor, 0);
+            rChild.BalanceFactor = rChild.BalanceFactor - 1 + Math.Min(node.BalanceFactor, 0);
         }
     }
 }
