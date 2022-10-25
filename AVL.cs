@@ -69,12 +69,12 @@ namespace BST
                     AVLNode lChil = (AVLNode)node.LeftChild;
                     if (lChil.BalanceFactor >= 0)
                     {
-                        // this.rotateRight(node);
+                        this.rotateRight(node);
                     }
                     else
                     {
                         this.rotateLeft((AVLNode)node.LeftChild);
-                        // this.rotateRight(node);
+                        this.rotateRight(node);
                     }
                 }
                 else
@@ -86,7 +86,7 @@ namespace BST
                     }
                     else
                     {
-                        // this.rotateRight((AVLNode)node.RightChild);
+                        this.rotateRight((AVLNode)node.RightChild);
                         this.rotateLeft(node);
                     }
                 }
@@ -163,6 +163,40 @@ namespace BST
             int newAB = rChild.BalanceFactor + 1 + Math.Max(newBB, 0);
             node.BalanceFactor = newBB;
             rChild.BalanceFactor = newAB;
+        }
+
+        private void rotateRight(AVLNode node){
+            AVLNode parent = (AVLNode)node.Parent;
+            AVLNode lChild = (AVLNode)node.LeftChild;
+            AVLNode lrChild = (AVLNode)lChild.RightChild;
+            if (parent == null)
+            {
+                this.Root = lChild;
+                lChild.Parent = null;
+            }
+            else
+            {
+                if (parent.LeftChild == node)
+                {
+                    parent.LeftChild = lChild;
+                }
+                else
+                {
+                    parent.RightChild = lChild;
+                }
+                lChild.Parent = parent;
+            }
+            node.LeftChild = lrChild;
+            if (lrChild != null)
+            {
+                lrChild.Parent = node;
+            }
+            lChild.RightChild = node;
+            node.Parent = lChild;
+            int newB_FB = node.BalanceFactor - 1 - Math.Max(lChild.BalanceFactor, 0);
+            int newA_FB = lChild.BalanceFactor - 1 + Math.Min(newB_FB, 0);
+            node.BalanceFactor = newB_FB;
+            lChild.BalanceFactor = newA_FB;
         }
     }
 }
