@@ -130,12 +130,11 @@ namespace BST
             }
                 
         }
-        private void rotateLeft(AVLNode node)
-        {
+        
+        private void rotateLeft(AVLNode node){
             AVLNode parent = (AVLNode)node.Parent;
             AVLNode rChild = (AVLNode)node.RightChild;
             AVLNode rlChild = (AVLNode)rChild.LeftChild;
-
             if (parent == null)
             {
                 this.Root = rChild;
@@ -160,9 +159,10 @@ namespace BST
             }
             rChild.LeftChild = node;
             node.Parent = rChild;
-
-            node.BalanceFactor = node.BalanceFactor - 1 - Math.Max(rChild.BalanceFactor, 0);
-            rChild.BalanceFactor = rChild.BalanceFactor - 1 + Math.Min(node.BalanceFactor, 0);
+            int newBB = node.BalanceFactor + 1 - Math.Min(rChild.BalanceFactor, 0);
+            int newAB = rChild.BalanceFactor + 1 + Math.Max(newBB, 0);
+            node.BalanceFactor = newBB;
+            rChild.BalanceFactor = newAB;
         }
     }
 }
