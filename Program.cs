@@ -1,4 +1,4 @@
-﻿BST.AVL tree = new(20);
+﻿BST.RedBlack tree = new(20);
 object[] arr = {15, 10, 9, 8};
 foreach (var item in arr){
     tree.Insert(item);
