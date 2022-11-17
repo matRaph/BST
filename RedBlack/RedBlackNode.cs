@@ -14,6 +14,10 @@ namespace BST{
         {
             this.Color = EnumColor.Red;
         }
+        public bool IsBlack()
+        {
+            return this.Color == EnumColor.Black;
+        }
 
         public void SetBlack()
         {
@@ -25,9 +29,24 @@ namespace BST{
             this.Color = EnumColor.Red;
         }
 
+        public override void addLeftChild(object element)
+        {
+            this.LeftChild = new RedBlackNode(this, element);
+        }
+
+        public override void addRightChild(object element)
+        {
+            this.RightChild = new RedBlackNode(this, element);
+        }
+
         public override string ToString()
         {
-            return $"{this.Element}({this.Color})";
+            if(this.Color == EnumColor.Red){
+                return this.Element.ToString() + "(R)";
+            }
+            else{
+                return this.Element.ToString() + "(B)";
+            }
         }
     }
 }

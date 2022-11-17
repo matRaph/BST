@@ -10,7 +10,7 @@ namespace BST{
     {
         public RedBlack (object element) : base(element) { 
             RedBlackNode root = new(null, element);
-            root.SetBlack(root);
+            root.SetBlack();
             this.Root = root;
             this.Size = 1;
         }
@@ -29,45 +29,148 @@ namespace BST{
             //Insere o nó na árvore
             RedBlackNode insertedNode = InsertTree(element);
 
-            //Caso 2: Se o tio é vermelho, troca a cor do pai e do tio para preto e a cor do avô para vermelho,
-            //e chama a função recursivamente para o avô
-            if (insertedNode.Parent != null && insertedNode.Parent.Parent != null)
-            {
-                this.Case2(insertedNode);
-                // RedBlackNode parent = (RedBlackNode)insertedNode.Parent;
-                // RedBlackNode grandparent = (RedBlackNode)parent.Parent;
-                // RedBlackNode uncle = (RedBlackNode)grandparent.LeftChild == parent ? (RedBlackNode)grandparent.RightChild : (RedBlackNode)grandparent.LeftChild;
-                
-                // if (uncle != null && uncle.Color == RedBlackNode.EnumColor.Red)
-                // {
-                //     parent.SetBlack();
-                //     uncle.SetBlack();
-                //     grandparent.SetRed();
-                //     InsertRB(grandparent.Element);
-                //     return;
-                // }
-            }
+            // //Caso 2: Se o tio é vermelho, troca a cor do pai e do tio para preto e a cor do avô para vermelho,
+            // //e chama a função recursivamente para o avô
+            // this.Case2(insertedNode);
+            
+            // //Caso 3: Se o tio é preto, faz rotações para balancear a árvore
+            // this.Case3(insertedNode);
+
+            VerifyInsert(insertedNode);
             
         }
-        public RedBlackNode Case2(RedBlackNode InsetedNode){
-            RedBlackNode parent = (RedBlackNode)InsetedNode.Parent;
-            RedBlackNode grandparent = (RedBlackNode)parent.Parent;
-            RedBlackNode uncle = (RedBlackNode)grandparent.LeftChild == parent ? (RedBlackNode)grandparent.RightChild : (RedBlackNode)grandparent.LeftChild;
-            
-            if (uncle != null && uncle.Color == RedBlackNode.EnumColor.Red)
+        public RedBlackNode VerifyInsert(RedBlackNode insertedNode){
+            //Armazena os nós que serão verificados
+            RedBlackNode? parent = (RedBlackNode)insertedNode.Parent;
+            RedBlackNode? grandparent = (RedBlackNode)parent.Parent;
+            RedBlackNode? uncle = grandparent != null 
+                ? (RedBlackNode)grandparent.LeftChild == parent ? 
+                    (RedBlackNode)grandparent.RightChild : (RedBlackNode)grandparent.LeftChild
+                        : null;
+
+            //Caso 1: Se o pai é preto
+            if (parent.IsBlack())
             {
+                return insertedNode;
+            }
+
+            //Caso 2: Se o tio é vermelho, troca a cor do pai e do tio para preto e a cor do avô para vermelho,
+            //e chama a função recursivamente para o avõ
+            if(uncle != null && !uncle.IsBlack()){
                 parent.SetBlack();
                 uncle.SetBlack();
-                grandparent.SetRed();
-                InsertRB(grandparent.Element);
-                return grandparent;
+                if(grandparent != Root){
+                    grandparent.SetRed();
+                    VerifyInsert(grandparent);
+                }
+                return insertedNode;
+                // grandparent.SetRed();
+                // return VerifyInsert(grandparent);
             }
-            return null;
+
+            //Caso 3: Se o tio é preto, faz as rotações para balancear a árvore
+            if(uncle == null || uncle.IsBlack()){
+                //Caso 3.1: Se o nó inserido é filho esquerdo do pai e o pai é filho esquerdo do avõ,
+                //faz uma rotação simples à direita
+                if(insertedNode == parent.LeftChild && parent == grandparent.LeftChild){
+                    RotateRight(grandparent);
+                    parent.SetBlack();
+                    grandparent.SetRed();
+                    return insertedNode;
+                }
+                
+                //Caso 3.2: Se o nó inserido é filho direito do pai e o pai é filho direito do avõ,
+                //faz uma rotação simples à esquerda
+                if(insertedNode == parent.RightChild && parent == grandparent.RightChild){
+                    RotateLeft(grandparent);
+                    parent.SetBlack();
+                    grandparent.SetRed();
+                    return insertedNode;
+                }
+
+                //Caso 3.3: Se o nó inserido é filho esquerdo do pai, e o pai é filho direito do avõ,
+                //faz uma rotação dupla à esquerda
+                if(insertedNode == parent.LeftChild && parent == grandparent.RightChild){
+                    RotateRight(parent);
+                    RotateLeft(grandparent);
+                    insertedNode.SetBlack();
+                    grandparent.SetRed();
+                    return insertedNode;
+                }
+
+                //Caso 3.4: Se o nó inserido é filho direito do pai, e o pai é filho esquerdo do avõ,
+                //faz uma rotação dupla à direita
+                if(insertedNode == parent.RightChild && parent == grandparent.LeftChild){
+                    RotateLeft(parent);
+                    RotateRight(grandparent);
+                    insertedNode.SetBlack();
+                    grandparent.SetRed();
+                    return insertedNode;
+                }
+            }
+            return insertedNode;
+        }
+        
+        public void RotateRight(RedBlackNode node){
+            RedBlackNode parent = (RedBlackNode)node.Parent;
+            RedBlackNode leftChild = (RedBlackNode)node.LeftChild;
+            RedBlackNode leftChildRightChild = (RedBlackNode)leftChild.RightChild;
+
+            //Faz a rotação
+            leftChild.RightChild = node;
+            node.LeftChild = leftChildRightChild;
+            leftChild.Parent = parent;
+            node.Parent = leftChild;
+
+            //Verifica se o nó que foi rotacionado é a raiz
+            if (parent == null)
+            {
+                this.Root = leftChild;
+            }
+            else
+            {
+                if (parent.LeftChild == node)
+                {
+                    parent.LeftChild = leftChild;
+                }
+                else
+                {
+                    parent.RightChild = leftChild;
+                }
+            }
+        }
+        public void RotateLeft(RedBlackNode node){
+            RedBlackNode parent = (RedBlackNode)node.Parent;
+            RedBlackNode rightChild = (RedBlackNode)node.RightChild;
+            RedBlackNode rightChildLeftChild = (RedBlackNode)rightChild.LeftChild;
+
+            //Faz a rotação
+            rightChild.LeftChild = node;
+            node.RightChild = rightChildLeftChild;
+            rightChild.Parent = parent;
+            node.Parent = rightChild;
+
+            //Verifica se o nó que foi rotacionado é a raiz
+            if (parent == null)
+            {
+                this.Root = rightChild;
+            }
+            else
+            {
+                if (parent.LeftChild == node)
+                {
+                    parent.LeftChild = rightChild;
+                }
+                else
+                {
+                    parent.RightChild = rightChild;
+                }
+            }
         }
         public RedBlackNode InsertTree(object element){
             //O pai do novo nó
-            Node parent = null;
-            Node auxNode = this.Root;
+            RedBlackNode parent = null;
+            RedBlackNode auxNode = (RedBlackNode)this.Root;
 
             while (auxNode != null)
             {
@@ -75,12 +178,12 @@ namespace BST{
                 //Se elemento novo for menor que nó atual
                 if (Comparer.comparer(element, auxNode.Element) == -1)
                 {
-                    auxNode = auxNode.LeftChild;
+                    auxNode = (RedBlackNode)auxNode.LeftChild;
                 }
                 //Se elemento novo for maior ou igual ao nó atual
                 else
                 {
-                    auxNode = auxNode.RightChild;
+                    auxNode = (RedBlackNode)auxNode.RightChild;
                 }
             }
 
